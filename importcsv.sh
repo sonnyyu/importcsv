@@ -1,13 +1,22 @@
 #!/bin/bash
 
 # show commands being executed, per debug
+
 set -x
+
+exec > >(sudo tee install.log)
+exec 2>&1
+
 
 # define database connectivity
 _db="csv_imports"
 _db_user="root"
-_db_password="4Pass2w0rd~"
-
+_db_password="Pass2w0rd~"
+mysql -u${_db_user} -p${_db_password}  -e "DROP DATABASE IF EXISTS ${_db}"
+mysql -u${_db_user} -p${_db_password}  -e "CREATE DATABASE ${_db}"
+mysql -u${_db_user} -p${_db_password} -e "GRANT ALL PRIVILEGES ON ${_db}.* TO ${_db}@localhost IDENTIFIED BY '${_db_password}'"
+rm -rf /var/lib/mysql-files/*
+cp  /opt/splunk/etc/apps/Splunk_Security_Essentials/lookups/* /var/lib/mysql-files/
 # define directory containing CSV files
 #_csv_directory="/opt/splunk/etc/apps/Splunk_Security_Essentials/lookups"
 _csv_directory="/var/lib/mysql-files"
